@@ -1,0 +1,14 @@
+require 'rake'
+require 'rubygems'
+require 'spec/rake/spectask'
+require 'rake/gempackagetask'
+require 'rake/rdoctask'
+
+namespace :test do
+  Spec::Rake::SpecTask.new('run_with_rcov') do |t|
+    t.spec_files = FileList['spec/rack/auth/*.rb', 'spec/swt/*.rb'].reject{|f| f.include?('functional')}
+    t.rcov = true
+    t.rcov_opts = ['--text-report', '--exclude', "exclude.*/.gem,spec,Library,#{ENV['GEM_HOME']}", '--sort', 'coverage' ]
+    t.spec_opts = ["--colour",  "--loadby random",  "--format progress", "--backtrace"]
+  end
+end
