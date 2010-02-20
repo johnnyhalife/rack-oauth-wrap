@@ -1,6 +1,6 @@
 require 'rack/auth/abstract/handler'
 require 'rack/auth/abstract/request'
-require 'lib/simplewebtoken'
+require 'simplewebtoken'
 
 module Rack
   module Auth
@@ -14,6 +14,9 @@ module Rack
     #
     # See also: SimpleWebToken::SimpleWebTokenHandler
     class WRAP < AbstractHandler
+      # Middleware Gem Versioning
+      VERSION = "0.5.2"
+      
       # Creates a new instance of Rack::Auth::WRAP, the opts can be used
       # as the following.
       # 

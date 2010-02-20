@@ -4,11 +4,48 @@ require 'spec/rake/spectask'
 require 'rake/gempackagetask'
 require 'rake/rdoctask'
 
+require 'lib/rack/auth/wrap'
+
 namespace :test do
   Spec::Rake::SpecTask.new('run_with_rcov') do |t|
     t.spec_files = FileList['spec/rack/auth/*.rb', 'spec/swt/*.rb'].reject{|f| f.include?('functional')}
     t.rcov = true
     t.rcov_opts = ['--text-report', '--exclude', "exclude.*/.gem,spec,Library,#{ENV['GEM_HOME']}", '--sort', 'coverage' ]
     t.spec_opts = ["--colour",  "--loadby random",  "--format progress", "--backtrace"]
+  end
+end
+
+namespace :docs do
+  Rake::RDocTask.new do |t|
+  	t.rdoc_dir = 'sdk/public/'
+  	t.options << '--line-numbers' << '--inline-source' << '-A cattr_accessor=object'
+  	t.options << '--charset' << 'utf-8'
+  	t.rdoc_files.include('README.rdoc')
+  	t.rdoc_files.include('lib/**/*.rb')
+  end
+end
+
+
+namespace :dist do  
+  spec = Gem::Specification.new do |s|
+    s.name              = 'rack-oauth-wrap'
+    s.version           = Gem::Version.new(Rack::Auth::WRAP::VERSION)
+    s.summary           = "Rack Middleware for authenticating users using oAuth WRAP Protocol"
+    s.description       = "A simple implementation of Web Resource Authorization Protocol (WRAP) for Rack as middleware."
+    s.email             = 'johnny.halife@me.com'
+    s.author            = 'Johnny G. Halife & Juan Pablo Garcia Dalolla'
+    s.homepage          = 'http://rack-oauth-wrap.heroku.com'
+    s.require_paths     = ["lib"]
+    s.files             = FileList['rakefile', 'lib/**/*.rb']
+    s.test_files        = Dir['spec/**/*']
+    s.has_rdoc          = true
+    s.rdoc_options      << '--line-numbers' << '--inline-source' << '-A cattr_accessor=object'
+    
+    # Dependencies
+    s.add_dependency 'ruby-hmac'
+  end
+  
+  Rake::GemPackageTask.new(spec) do |pkg|
+    pkg.need_tar = true
   end
 end

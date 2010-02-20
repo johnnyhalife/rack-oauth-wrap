@@ -1,0 +1,69 @@
+=Rack::Auth::WRAP, the oAuth WRAP Middleware
+
+Tired of doing always the same <em>Users</em> table over and over again, tired to have your application user base not integrated
+with the rest of your company or other services that your end-users already have.
+
+What about REST? While Microsoft, Oracle (Sun), IBM and others already defined the concept <em>Federated Identity</em> is usually applies
+to SOA/SOAP environments. Other alternatives like oAuth, OpenID, WSFederation, SAML2.0 already have Web Profile but WRAP presents
+an homogenized alternative for most of the common uses cases.
+
+==What the heck is WRAP?
+Web Resource Authorization Protocol (WRAP) is a profile of OAuth, also called OAuth WRAP. While similar in pattern to OAuth 1.0A,
+the WRAP profile(s) have a number of important capabilities that were not available previously in OAuth. This specification 
+is being contributed to the IETF OAuth WG.
+
+Also this same group owns the specification for the SWT (Simple-Web-Token), for more information
+read http://wiki.oauth.net/OAuth-WRAP or visit the http://groups.google.com/group/oauth-wrap-wg.
+
+The latest specification for the complete protocol can be found at Google Group as HTML (RFC properly formatted) on http://groups.google.com/group/oauth-wrap-wg/attach/981df73f2839b8ef/draft-hardt-oauth-wrap-01.html?part=5
+
+===Limitations
+As the current version of the middleware (gem available at gemcutter.org) we are covering the request behavior for Client 
+calls	protected	resource using	HTTP Header as described on the WRAP spec, and the fully SWT (simple web token) spec.
+
+There's no support for receiving the token on the Body or QueryString (yet).
+
+==Usage
+First of all, as usual do
+
+	[sudo] gem install rack-oauth-wrap --source http://gemcutter.org
+
+The minimal amount of configuration that you require to start authenticating users is
+
+	use Rack::Auth::WRAP, :shared_secret => 'asbdg172geqne9128731=='  # => shared secret between provider and consumer
+	
+And that's it, if someone sends you a token on a header using WRAP and it's valid, it will be stored as hash at
+	
+	@env['REMOTE_USER']['email'] #=> will return the value of the claim email for the logged user
+	@env['REMOTE_USER']['org.security.roles'] #=> will return the value of the claim roles for the logged user
+	
+If the validation fails it will return a <b>401 HTTP Response Code with WWW-Authenticate: WRAP header</b>
+
+Additionally, you can configure more values to be asserted on the token as follows
+
+	use Rack::Auth::WRAP, :shared_secret => 'asbdg172geqne9128731==',  # => shared secret between provider and consumer
+			      :trusted_issuers => 'http://identityprovider', # => URI of the identity provider
+			      :audiences => 'http://app' # => URI of the application
+
+==Remarks
+Out-of-the-box the middleware <b>just checks for a HMAC-SHA256 signature</b> provided with the token (<em>symmetric check</em>) 
+and for the token to be expired. 
+
+If <em>:trusted_issuers</em> (can be multiple) and/or <em>:audiences</em> (can be multiple) are provided while configuring the middleware
+these values are asserted on any given token.
+
+==TODO's
+These are the most probable features to be implemented by us (at some point in time), it's more than obvious that you can contribute
+
+- Implement "Client Calls Protected Resource Using URL Query Parameter"
+- Implement "Client Calls Protected Resource Using Post Parameters"
+- Implement "Web Profile"
+
+==Meta
+Written by Johnny G. Halife (johnny.halife at me dot com) and Juan Pablo Garcia Dalolla (juanpablogarcia at gmail dot com)
+
+Released under the <em><b>'do the fuck you want'</b></em> license.
+
+http://github.com/johnnyhalife/rack-oauth-wrap
+
+http://rack-oauth-wrap.heroku.com
