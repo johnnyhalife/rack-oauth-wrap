@@ -15,7 +15,7 @@ module Rack
     # See also: SimpleWebToken::SimpleWebTokenHandler
     class WRAP < AbstractHandler
       # Middleware Gem Versioning
-      VERSION = "0.5.2"
+      VERSION = "0.5.2.2"
       
       # Creates a new instance of Rack::Auth::WRAP, the opts can be used
       # as the following.
